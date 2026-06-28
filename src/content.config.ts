@@ -1,18 +1,16 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { microcmsTweetsLoader } from './loaders/microcms-tweets';
 
 const tweets = defineCollection({
-	// Load MDX files in the `src/content/tweets/` directory.
-	loader: glob({ base: './src/content/tweets', pattern: '**/*.mdx' }),
-	schema: ({ image }) =>
-		z.object({
-			handle: z.string(),
-			displayName: z.string(),
-			avatar: z.optional(image()),
-			pubDate: z.coerce.date(),
-			images: z.array(image()).optional(),
-		}),
+	loader: microcmsTweetsLoader(),
+	schema: z.object({
+		text: z.string(),
+		pubDate: z.coerce.date(),
+		handle: z.string(),
+		displayName: z.string(),
+		images: z.array(z.string().url()).optional(),
+	}),
 });
 
 export const collections = { tweets };

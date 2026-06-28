@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import { PROFILE } from '../consts';
 
@@ -22,11 +21,7 @@ const formatDate = (date: Date) =>
 
 <article class="tweet">
 	<div class="avatar">
-		{data.avatar ? (
-			<Image src={data.avatar} alt={data.displayName} width={40} height={40} />
-		) : (
-			<img src={PROFILE.avatarUrl} alt={data.displayName} width={40} height={40} />
-		)}
+		<img src={PROFILE.avatarUrl} alt={data.displayName} width={40} height={40} />
 	</div>
 
 	<div class="body">
@@ -41,14 +36,16 @@ const formatDate = (date: Date) =>
 			)}
 		</div>
 
-		<div class="content">
-			<slot />
-		</div>
+		{data.text && (
+			<div class="content">
+				<p>{data.text}</p>
+			</div>
+		)}
 
 		{data.images && data.images.length > 0 && (
 			<div class:list={['images', `n-${data.images.length}`]}>
-				{data.images.map((img) => (
-					<Image src={img} alt="" widths={[400, 800]} sizes="(max-width: 600px) 100vw, 500px" />
+				{data.images.map((url) => (
+					<img src={url} alt="" loading="lazy" width={500} height={500} />
 				))}
 			</div>
 		)}
@@ -62,7 +59,7 @@ const formatDate = (date: Date) =>
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid rgb(var(--gray-light));
 	}
-	.avatar :global(img) {
+	.avatar img {
 		width: 40px;
 		height: 40px;
 		border-radius: 50%;
@@ -106,18 +103,9 @@ const formatDate = (date: Date) =>
 		margin-top: 0.15rem;
 		word-break: break-word;
 	}
-	.content :global(p) {
-		margin: 0 0 0.4em 0;
-	}
-	.content :global(p:last-child) {
-		margin-bottom: 0;
-	}
-	.content :global(a) {
-		color: var(--accent);
-		text-decoration: none;
-	}
-	.content :global(a:hover) {
-		text-decoration: underline;
+	.content p {
+		margin: 0;
+		white-space: pre-line;
 	}
 
 	.images {
@@ -137,18 +125,18 @@ const formatDate = (date: Date) =>
 	.images.n-4 {
 		grid-template-columns: 1fr 1fr;
 	}
-	.images :global(img) {
+	.images img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		border-radius: 0;
 	}
-	.images.n-1 :global(img) {
+	.images.n-1 img {
 		aspect-ratio: 16 / 9;
 	}
-	.images.n-2 :global(img),
-	.images.n-3 :global(img),
-	.images.n-4 :global(img) {
+	.images.n-2 img,
+	.images.n-3 img,
+	.images.n-4 img {
 		aspect-ratio: 1 / 1;
 	}
 </style>

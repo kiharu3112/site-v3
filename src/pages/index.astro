@@ -1,18 +1,11 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import TweetCard from '../components/TweetCard.astro';
 import { PROFILE, SITE_TITLE } from '../consts';
 
 const tweets = (await getCollection('tweets')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-const rendered = await Promise.all(
-	tweets.map(async (tweet) => ({
-		tweet,
-		Content: (await render(tweet)).Content,
-	})),
 );
 ---
 
@@ -74,10 +67,8 @@ const rendered = await Promise.all(
 					<p class="handle">@{PROFILE.handle}</p>
 					<p class="bio">{PROFILE.bio}</p>
 				</div>
-				{rendered.map(({ tweet, Content }) => (
-					<TweetCard tweet={tweet} linkToDetail={false}>
-						<Content />
-					</TweetCard>
+				{tweets.map((tweet) => (
+					<TweetCard tweet={tweet} linkToDetail={false} />
 				))}
 			</div>
 		</main>
