@@ -1,0 +1,154 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { PROFILE } from '../consts';
+
+interface Props {
+	tweet: CollectionEntry<'tweets'>;
+	linkToDetail?: boolean;
+}
+
+const { tweet, linkToDetail = true } = Astro.props;
+const { data } = tweet;
+
+const formatDate = (date: Date) =>
+	date.toLocaleString('en-us', {
+		month: 'short',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+	});
+---
+
+<article class="tweet">
+	<div class="avatar">
+		{data.avatar ? (
+			<Image src={data.avatar} alt={data.displayName} width={40} height={40} />
+		) : (
+			<img src={PROFILE.avatarUrl} alt={data.displayName} width={40} height={40} />
+		)}
+	</div>
+
+	<div class="body">
+		<div class="meta">
+			<a href="/aboutme" class="name">{data.displayName}</a>
+			<a href="/aboutme" class="handle">@{data.handle}</a>
+			<span class="sep">·</span>
+			{linkToDetail ? (
+				<a href={`/${tweet.id}`} class="time">{formatDate(data.pubDate)}</a>
+			) : (
+				<span class="time">{formatDate(data.pubDate)}</span>
+			)}
+		</div>
+
+		<div class="content">
+			<slot />
+		</div>
+
+		{data.images && data.images.length > 0 && (
+			<div class:list={['images', `n-${data.images.length}`]}>
+				{data.images.map((img) => (
+					<Image src={img} alt="" widths={[400, 800]} sizes="(max-width: 600px) 100vw, 500px" />
+				))}
+			</div>
+		)}
+	</div>
+</article>
+
+<style>
+	.tweet {
+		display: flex;
+		gap: 0.625rem;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.avatar :global(img) {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+	.body {
+		flex: 1;
+		min-width: 0;
+	}
+	.meta {
+		display: flex;
+		align-items: baseline;
+		gap: 0.3rem;
+		flex-wrap: wrap;
+		font-size: 0.85rem;
+	}
+	.name {
+		font-weight: 700;
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+	.name:hover {
+		text-decoration: underline;
+	}
+	.handle,
+	.sep,
+	.time {
+		color: rgb(var(--gray));
+		text-decoration: none;
+	}
+	.handle:hover {
+		text-decoration: underline;
+	}
+	.time:hover {
+		text-decoration: underline;
+	}
+	.content {
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: rgb(var(--gray-dark));
+		margin-top: 0.15rem;
+		word-break: break-word;
+	}
+	.content :global(p) {
+		margin: 0 0 0.4em 0;
+	}
+	.content :global(p:last-child) {
+		margin-bottom: 0;
+	}
+	.content :global(a) {
+		color: var(--accent);
+		text-decoration: none;
+	}
+	.content :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.images {
+		display: grid;
+		gap: 2px;
+		margin-top: 0.6rem;
+		border-radius: 12px;
+		overflow: hidden;
+	}
+	.images.n-1 {
+		grid-template-columns: 1fr;
+	}
+	.images.n-2 {
+		grid-template-columns: 1fr 1fr;
+	}
+	.images.n-3,
+	.images.n-4 {
+		grid-template-columns: 1fr 1fr;
+	}
+	.images :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 0;
+	}
+	.images.n-1 :global(img) {
+		aspect-ratio: 16 / 9;
+	}
+	.images.n-2 :global(img),
+	.images.n-3 :global(img),
+	.images.n-4 :global(img) {
+		aspect-ratio: 1 / 1;
+	}
+</style>
